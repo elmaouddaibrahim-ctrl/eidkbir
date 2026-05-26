@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ar" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>عيد أضحى مبارك — Eid Al-Adha Mubarak</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Amiri:ital,wght@0,400;0,700;1,400&family=Lateef:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#f5c842;
+  --gold2:#ffd700;
+  --deep-gold:#c8952a;
+  --bg-deep:#0a0a1a;
+  --bg-mid:#0d1024;
+  --teal:#1a8a7a;
+  --rose:#c0392b;
+  --emerald:#1a6b4a;
+  --sky:#1a4a8a;
+  --purple:#4a1a8a;
+}
+html,body{width:100%;min-height:100%;overflow-x:hidden;background:var(--bg-deep)}
+
+/* ─── LOADING SCREEN ─── */
+#loader{
+  position:fixed;inset:0;z-index:9999;
+  background:radial-gradient(ellipse at center, #0d1535 0%, #04060f 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s ease, visibility .8s ease;
+}
+#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader-moon{
+  width:90px;height:90px;position:relative;margin-bottom:30px;
+  animation:moonSpin 2s linear infinite;
+}
+.loader-moon svg{filter:drop-shadow(0 0 18px var(--gold))}
+@keyframes moonSpin{to{transform:rotate(360deg)}}
+.loader-text{
+  font-family:'Cinzel Decorative',serif;color:var(--gold);
+  font-size:1.1rem;letter-spacing:.3em;margin-bottom:20px;opacity:.8;
+}
+.loader-bar{width:220px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.loader-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));width:0;animation:loadFill 2.2s ease forwards}
+@keyframes loadFill{to{width:100%}}
+
+/* ─── NIGHT SKY BACKGROUND ─── */
+#sky-bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse at 30% 20%, #1a2455 0%, #0a0a1a 60%),
+             radial-gradient(ellipse at 70% 80%, #1a1040 0%, transparent 60%);
+  overflow:hidden;
+}
+.lantern-light{
+  position:absolute;border-radius:50%;
+  animation:lanternPulse var(--dur,6s) ease-in-out infinite alternate;
+  opacity:.18;
+  pointer-events:none;
+}
+@keyframes lanternPulse{
+  0%{transform:scale(1) translate(0,0);opacity:.12}
+  100%{transform:scale(1.3) translate(var(--tx,10px),var(--ty,-15px));opacity:.25}
+}
+
+/* ─── STARS ─── */
+.star{
+  position:absolute;border-radius:50%;
+  animation:twinkle var(--dur,3s) ease-in-out infinite alternate;
+  opacity:0;
+}
+.star.plus{border-radius:0}
+@keyframes twinkle{
+  0%{opacity:0;transform:scale(.6)}
+  100%{opacity:var(--op,1);transform:scale(1.1)}
+}
+
+/* ─── BUNTING ─── */
+#bunting-canvas{
+  position:fixed;top:0;left:0;width:100%;height:160px;z-index:5;
+  pointer-events:none;
+}
+#bunting-canvas.interactive{pointer-events:all}
+
+/* ─── MAIN CONTENT ─── */
+#main{
+  position:relative;z-index:10;
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:180px 20px 60px;
+}
+
+/* ─── TITLE ─── */
+.title-wrap{text-align:center;margin-bottom:16px;opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s ease}
+.title-wrap.visible{opacity:1;transform:translateY(0)}
+.title-en{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(2rem,6vw,4.2rem);
+  font-weight:900;
+  background:linear-gradient(135deg,#ffe066 0%,#f5c842 40%,#ffa500 70%,#ffe066 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  text-shadow:none;
+  filter:drop-shadow(0 0 20px rgba(245,200,66,.6));
+  letter-spacing:.06em;
+  animation:shimmerTitle 3s linear infinite;
+  background-size:200% auto;
+}
+@keyframes shimmerTitle{to{background-position:200% center}}
+.title-ar{
+  font-family:'Lateef',serif;
+  font-size:clamp(1.8rem,5vw,3.4rem);
+  color:var(--gold2);
+  text-shadow:0 0 25px rgba(255,215,0,.5);
+  letter-spacing:.05em;
+  margin-top:6px;
+}
+.subtitle{
+  font-family:'Amiri',serif;
+  font-size:clamp(1rem,2.5vw,1.4rem);
+  color:rgba(255,230,150,.7);
+  letter-spacing:.15em;
+  margin-top:10px;
+  opacity:0;transform:translateY(20px);
+  transition:opacity .8s ease .3s,transform .8s ease .3s;
+}
+.subtitle.visible{opacity:1;transform:translateY(0)}
+
+/* ─── SHEEP ─── */
+#sheep-wrap{
+  margin:30px auto 10px;cursor:pointer;
+  opacity:0;transform:translateY(60px) scale(.8);
+  transition:opacity .8s ease .5s, transform .8s cubic-bezier(.34,1.56,.64,1) .5s;
+}
+#sheep-wrap.visible{opacity:1;transform:translateY(0) scale(1)}
+#sheep-wrap.jumping{animation:sheepJump .7s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sheepJump{0%,100%{transform:translateY(0) scale(1)}30%{transform:translateY(-60px) scale(1.08,.92)}60%{transform:translateY(-30px) scale(.95,1.05)}}
+.sheep-svg{
+  width:180px;height:auto;
+  filter:drop-shadow(0 10px 25px rgba(255,200,50,.35));
+}
+.sheep-body{animation:cloudPulse 3s ease-in-out infinite}
+.sheep-head{animation:headBob 2.5s ease-in-out infinite}
+.sheep-eye{animation:blink 4s ease-in-out infinite}
+@keyframes cloudPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+@keyframes headBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes blink{0%,45%,55%,100%{transform:scaleY(1)}50%{transform:scaleY(.05)}}
+
+/* ─── FIREWORKS BUTTON ─── */
+.fw-btn{
+  margin:20px auto 40px;
+  font-family:'Cinzel Decorative',serif;
+  font-size:1rem;letter-spacing:.15em;
+  padding:14px 36px;
+  background:linear-gradient(135deg,#c8952a,#f5c842,#c8952a);
+  background-size:200% auto;
+  color:#0a0a1a;font-weight:700;border:none;border-radius:50px;
+  cursor:pointer;position:relative;overflow:hidden;
+  box-shadow:0 4px 30px rgba(245,200,66,.5),0 0 0 2px rgba(245,200,66,.3);
+  transition:transform .2s,box-shadow .2s;
+  animation:btnShimmer 2s linear infinite;
+}
+@keyframes btnShimmer{to{background-position:200% center}}
+.fw-btn:hover{transform:scale(1.05);box-shadow:0 6px 40px rgba(245,200,66,.7),0 0 0 3px rgba(245,200,66,.5)}
+.fw-btn:active{transform:scale(.97)}
+.fw-btn::before{content:'🎆';margin-right:8px;font-size:1.1em}
+
+/* ─── GIFTS SECTION ─── */
+.gifts-title{
+  font-family:'Cinzel Decorative',serif;color:var(--gold);
+  font-size:1.5rem;letter-spacing:.1em;margin-bottom:30px;text-align:center;
+  text-shadow:0 0 20px rgba(245,200,66,.4);
+}
+.gifts-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:24px;max-width:900px;width:100%;
+  margin-bottom:60px;padding:0 10px;
+}
+.gift-wrap{
+  perspective:600px;opacity:0;transform:translateY(30px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+.gift-wrap.visible{opacity:1;transform:translateY(0)}
+.gift-inner{
+  width:100%;height:180px;
+  transform-style:preserve-3d;
+  transition:transform .7s cubic-bezier(.4,2,.4,1);
+  cursor:pointer;
+  position:relative;
+}
+.gift-inner.flipped{transform:rotateY(180deg)}
+.gift-face,.gift-back{
+  position:absolute;inset:0;
+  backface-visibility:hidden;
+  border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px;
+}
+.gift-face{
+  border:2px solid rgba(245,200,66,.3);
+  background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+  backdrop-filter:blur(4px);
+  box-shadow:0 4px 30px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.gift-back{
+  transform:rotateY(180deg);
+  background:linear-gradient(135deg,rgba(245,200,66,.15),rgba(200,149,42,.1));
+  border:2px solid rgba(245,200,66,.5);
+  box-shadow:0 4px 30px rgba(245,200,66,.2);
+}
+.gift-emoji{font-size:3rem;margin-bottom:8px;animation:giftBounce 2s ease-in-out infinite}
+@keyframes giftBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.gift-label{font-family:'Amiri',serif;color:var(--gold);font-size:.9rem;text-align:center;opacity:.8}
+.gift-blessing{
+  font-family:'Amiri',serif;color:var(--gold2);
+  font-size:.95rem;text-align:center;line-height:1.6;
+}
+.gift-ar{font-family:'Lateef',serif;font-size:1.1rem;color:rgba(255,220,100,.8);margin-top:8px;display:block}
+
+/* ─── FIREWORK PARTICLE ─── */
+.fw-particle{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:999;
+  animation:fwFly var(--dur,.8s) ease-out forwards;
+}
+@keyframes fwFly{
+  0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}
+}
+
+/* ─── CONFETTI ─── */
+.confetti{
+  position:fixed;top:-10px;pointer-events:none;z-index:998;
+  animation:confettiFall var(--dur,3s) linear forwards;
+}
+@keyframes confettiFall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(110vh) rotate(var(--rot,720deg));opacity:.3}
+}
+
+/* ─── FOOTER ─── */
+.footer{
+  text-align:center;padding:30px 20px;
+  font-family:'Amiri',serif;color:rgba(255,200,100,.4);font-size:.9rem;
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0a1a}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-moon">
+    <svg viewBox="0 0 90 90" width="90" height="90" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="moonGrad" cx="40%" cy="40%">
+          <stop offset="0%" stop-color="#ffe066"/>
+          <stop offset="100%" stop-color="#c8952a"/>
+        </radialGradient>
+      </defs>
+      <circle cx="45" cy="45" r="35" fill="url(#moonGrad)" opacity=".15"/>
+      <path d="M45 10 A35 35 0 1 1 10 45 A25 25 0 1 0 45 10 Z" fill="url(#moonGrad)"/>
+      <circle cx="62" cy="22" r="3" fill="#ffe066" opacity=".8"/>
+      <circle cx="70" cy="38" r="1.8" fill="#ffe066" opacity=".6"/>
+      <circle cx="55" cy="14" r="1.5" fill="#ffe066" opacity=".5"/>
+    </svg>
+  </div>
+  <div class="loader-text">EID AL-ADHA</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+</div>
+
+<!-- NIGHT SKY -->
+<div id="sky-bg" aria-hidden="true"></div>
+
+<!-- BUNTING CANVAS -->
+<canvas id="bunting-canvas"></canvas>
+
+<!-- FIREWORKS LAYER -->
+<div id="fw-layer" style="position:fixed;inset:0;pointer-events:none;z-index:997"></div>
+
+<!-- MAIN -->
+<main id="main" style="opacity:0;transition:opacity .8s ease .3s">
+
+  <!-- TITLE -->
+  <div class="title-wrap" id="title-block">
+    <div class="title-en">Eid Al-Adha Mubarak</div>
+    <div class="title-ar">عيد الأضحى مبارك</div>
+  </div>
+  <div class="subtitle" id="subtitle">✦ May your sacrifice be accepted &amp; your blessings multiplied ✦</div>
+
+  <!-- SHEEP -->
+  <div id="sheep-wrap" title="Click me!">
+    <svg class="sheep-svg" viewBox="0 0 220 180" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bodyGrad" cx="50%" cy="40%">
+          <stop offset="0%" stop-color="#f8f8f8"/>
+          <stop offset="100%" stop-color="#d0cfc8"/>
+        </radialGradient>
+        <radialGradient id="goldGlow" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#ffe066" stop-opacity=".6"/>
+          <stop offset="100%" stop-color="#c8952a" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="woolBlur"><feGaussianBlur stdDeviation="1.5"/></filter>
+      </defs>
+      <!-- shadow -->
+      <ellipse cx="110" cy="168" rx="55" ry="8" fill="rgba(0,0,0,.25)"/>
+      <!-- gold halo glow -->
+      <ellipse cx="110" cy="110" rx="80" ry="60" fill="url(#goldGlow)" opacity=".4"/>
+      <!-- BODY (cloud puffs) -->
+      <g class="sheep-body">
+        <ellipse cx="110" cy="120" rx="52" ry="38" fill="url(#bodyGrad)" filter="url(#woolBlur)"/>
+        <ellipse cx="84" cy="108" rx="28" ry="24" fill="#f0efea" filter="url(#woolBlur)"/>
+        <ellipse cx="136" cy="108" rx="28" ry="24" fill="#f0efea" filter="url(#woolBlur)"/>
+        <ellipse cx="110" cy="96" rx="32" ry="22" fill="#f8f8f8" filter="url(#woolBlur)"/>
+        <ellipse cx="88" cy="96" rx="20" ry="18" fill="#eeede6" filter="url(#woolBlur)"/>
+        <ellipse cx="132" cy="96" rx="20" ry="18" fill="#eeede6" filter="url(#woolBlur)"/>
+        <!-- ribbon -->
+        <rect x="86" y="125" width="48" height="8" rx="4" fill="#f5c842" opacity=".85"/>
+        <circle cx="110" cy="129" r="5" fill="#c8952a" stroke="#f5c842" stroke-width="1.5"/>
+      </g>
+      <!-- LEGS -->
+      <rect x="82" y="148" width="12" height="22" rx="6" fill="#6b5b4e"/>
+      <rect x="98" y="150" width="12" height="20" rx="6" fill="#6b5b4e"/>
+      <rect x="114" y="150" width="12" height="20" rx="6" fill="#6b5b4e"/>
+      <rect x="130" y="148" width="12" height="22" rx="6" fill="#6b5b4e"/>
+      <!-- hooves -->
+      <ellipse cx="88" cy="170" rx="7" ry="4" fill="#3a2e28"/>
+      <ellipse cx="104" cy="170" rx="7" ry="4" fill="#3a2e28"/>
+      <ellipse cx="120" cy="170" rx="7" ry="4" fill="#3a2e28"/>
+      <ellipse cx="136" cy="170" rx="7" ry="4" fill="#3a2e28"/>
+      <!-- HEAD -->
+      <g class="sheep-head" transform-origin="110 100">
+        <ellipse cx="110" cy="80" rx="24" ry="20" fill="#e8e0d0"/>
+        <!-- wool on head -->
+        <ellipse cx="102" cy="68" rx="14" ry="12" fill="#f0efea" filter="url(#woolBlur)"/>
+        <ellipse cx="118" cy="68" rx="14" ry="12" fill="#f0efea" filter="url(#woolBlur)"/>
+        <ellipse cx="110" cy="65" rx="16" ry="11" fill="#f8f8f8" filter="url(#woolBlur)"/>
+        <!-- EARS -->
+        <ellipse cx="87" cy="80" rx="9" ry="13" fill="#d4c4a8" transform="rotate(-20,87,80)"/>
+        <ellipse cx="133" cy="80" rx="9" ry="13" fill="#d4c4a8" transform="rotate(20,133,80)"/>
+        <ellipse cx="87" cy="80" rx="5" ry="8" fill="#e8a0a0" transform="rotate(-20,87,80)"/>
+        <ellipse cx="133" cy="80" rx="5" ry="8" fill="#e8a0a0" transform="rotate(20,133,80)"/>
+        <!-- EYES -->
+        <g class="sheep-eye">
+          <ellipse cx="100" cy="80" rx="5" ry="5" fill="#2a1a0a"/>
+          <ellipse cx="120" cy="80" rx="5" ry="5" fill="#2a1a0a"/>
+          <circle cx="102" cy="78" r="1.5" fill="white"/>
+          <circle cx="122" cy="78" r="1.5" fill="white"/>
+        </g>
+        <!-- NOSE -->
+        <ellipse cx="110" cy="92" rx="8" ry="5" fill="#c4a888"/>
+        <ellipse cx="107" cy="92" rx="2.5" ry="2" fill="#6b4040"/>
+        <ellipse cx="113" cy="92" rx="2.5" ry="2" fill="#6b4040"/>
+        <!-- SMILE -->
+        <path d="M104 96 Q110 100 116 96" stroke="#8b6050" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- GOLD BELL -->
+        <ellipse cx="110" cy="104" rx="6" ry="7" fill="#f5c842" stroke="#c8952a" stroke-width="1"/>
+        <path d="M107 108 Q110 111 113 108" stroke="#c8952a" stroke-width="1" fill="none"/>
+        <circle cx="110" cy="109" r="1.5" fill="#c8952a"/>
+      </g>
+      <!-- HORNS -->
+      <path d="M97 62 Q88 48 92 40" stroke="#c8952a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M123 62 Q132 48 128 40" stroke="#c8952a" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- TAIL -->
+      <ellipse cx="162" cy="118" rx="10" ry="12" fill="#f0efea" filter="url(#woolBlur)"/>
+    </svg>
+    <p style="text-align:center;font-family:'Amiri',serif;color:rgba(255,200,100,.6);font-size:.85rem;margin-top:4px">Click me! 🐑</p>
+  </div>
+
+  <!-- FIREWORKS BUTTON -->
+  <button class="fw-btn" id="fw-btn">Tap to Celebrate</button>
+
+  <!-- GIFTS -->
+  <div class="gifts-title">🎁 Open Your Eid Blessings</div>
+  <div class="gifts-grid" id="gifts-grid"></div>
+
+  <div class="footer">
+    🌙 Eid Al-Adha Mubarak — عيد الأضحى مبارك 🌙<br>
+    <span style="font-size:.75rem;opacity:.5">Made with ✨ and lots of ❤️</span>
+  </div>
+</main>
+
+<script>
+/* ═══════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════ */
+const rand=(a,b)=>Math.random()*(b-a)+a;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ═══════════════════════════════════════════
+   LOADING SEQUENCE
+═══════════════════════════════════════════ */
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('main').style.opacity='1';
+    initStars();
+    initLanterns();
+    setTimeout(revealContent,400);
+  },2500);
+});
+
+function revealContent(){
+  document.getElementById('title-block').classList.add('visible');
+  setTimeout(()=>document.getElementById('subtitle').classList.add('visible'),500);
+  setTimeout(()=>document.getElementById('sheep-wrap').classList.add('visible'),900);
+  setTimeout(initScrollReveal,1000);
+}
+
+/* ═══════════════════════════════════════════
+   STARS & PLUS SIGNS
+═══════════════════════════════════════════ */
+function initStars(){
+  const sky=document.getElementById('sky-bg');
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');
+    const isPlus=Math.random()<.25;
+    s.className='star'+(isPlus?' plus':'');
+    const size=rand(1.5,isPlus?6:4);
+    s.style.cssText=`
+      left:${rand(0,100)}%;top:${rand(0,100)}%;
+      width:${size}px;height:${isPlus?size*.3:size}px;
+      background:${isPlus?'none':'rgba(255,240,200,'+rand(.5,1)+')'};
+      ${isPlus?`box-shadow:0 ${-size*.35}px 0 ${size*.35}px rgba(255,240,200,.8), ${size*.35}px 0 0 ${size*.35}px rgba(255,240,200,.8),0 ${size*.35}px 0 ${size*.35}px rgba(255,240,200,.8), ${-size*.35}px 0 0 ${size*.35}px rgba(255,240,200,.8);background:rgba(255,240,200,.9);`:''}
+      --dur:${rand(1.5,5)}s;
+      --op:${rand(.4,1)};
+      animation-delay:${rand(0,5)}s;
+    `;
+    sky.appendChild(s);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   LANTERN LIGHTS
+═══════════════════════════════════════════ */
+function initLanterns(){
+  const sky=document.getElementById('sky-bg');
+  const colors=[
+    ['#f5c842','#ff8800'],
+    ['#1a8a7a','#0d4a3a'],
+    ['#c0392b','#7a1a1a'],
+    ['#4a1a8a','#2a0a5a'],
+    ['#1a4a8a','#0a2a5a'],
+  ];
+  colors.forEach(([c1,c2],i)=>{
+    const l=document.createElement('div');
+    l.className='lantern-light';
+    const sz=rand(280,480);
+    l.style.cssText=`
+      width:${sz}px;height:${sz}px;
+      left:${rand(-10,80)}%;top:${rand(-10,80)}%;
+      background:radial-gradient(circle,${c1}33 0%,${c2}11 50%,transparent 70%);
+      --dur:${rand(4,9)}s;
+      --tx:${rand(-20,20)}px;
+      --ty:${rand(-25,5)}px;
+      animation-delay:${rand(0,6)}s;
+    `;
+    sky.appendChild(l);
+  });
+}
+
+/* ═══════════════════════════════════════════
+   BUNTING (PHYSICS CANVAS)
+═══════════════════════════════════════════ */
+(function(){
+  const canvas=document.getElementById('bunting-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.classList.add('interactive');
+  let W,H,nodes=[],mouse={x:-999,y:-999};
+
+  const COLORS=['#f5c842','#1a8a7a','#c0392b','#4a1a8a','#1a4a8a','#f5c842','#1a8a7a','#ff8800','#c0392b'];
+  const NUM_FLAGS=18;
+  const SEG=60;
+
+  function resize(){
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=160;
+    buildRope();
+  }
+
+  function buildRope(){
+    nodes=[];
+    const step=W/(NUM_FLAGS+1);
+    const y0=40;
+    for(let i=0;i<=NUM_FLAGS+1;i++){
+      nodes.push({
+        x:step*i,y:y0+Math.sin(i*.5)*10,
+        ox:step*i,oy:y0+Math.sin(i*.5)*10,
+        vx:0,vy:0,
+        fixed:i===0||i===NUM_FLAGS+1,
+        color:COLORS[i%COLORS.length]
+      });
+    }
+  }
+
+  function update(){
+    nodes.forEach(n=>{
+      if(n.fixed)return;
+      n.vy+=.18;// gravity
+      // mouse repel
+      const dx=n.x-mouse.x,dy=n.y-mouse.y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<80){const f=(80-d)/80*.8;n.vx+=dx/d*f;n.vy+=dy/d*f;}
+      n.x+=n.vx;n.y+=n.vy;
+      n.vx*=.92;n.vy*=.92;
+      n.y=clamp(n.y,0,H-30);
+    });
+    // constraints
+    for(let iter=0;iter<5;iter++){
+      for(let i=0;i<nodes.length-1;i++){
+        const a=nodes[i],b=nodes[i+1];
+        const dx=b.x-a.x,dy=b.y-a.y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        const diff=(d-SEG)/d*.5;
+        if(!a.fixed){a.x+=dx*diff;a.y+=dy*diff;}
+        if(!b.fixed){b.x-=dx*diff;b.y-=dy*diff;}
+      }
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // rope
+    ctx.beginPath();
+    ctx.moveTo(nodes[0].x,nodes[0].y);
+    for(let i=1;i<nodes.length;i++)ctx.lineTo(nodes[i].x,nodes[i].y);
+    ctx.strokeStyle='rgba(200,149,42,.7)';ctx.lineWidth=2;ctx.stroke();
+
+    // flags
+    for(let i=0;i<nodes.length-1;i++){
+      const a=nodes[i],b=nodes[i+1];
+      const mx=(a.x+b.x)/2,my=(a.y+b.y)/2+28;
+      ctx.beginPath();
+      ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.lineTo(mx,my);
+      ctx.closePath();
+      ctx.fillStyle=nodes[i+1].color+'cc';
+      ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=.8;ctx.stroke();
+    }
+  }
+
+  function loop(){requestAnimationFrame(loop);update();draw();}
+
+  canvas.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+  canvas.addEventListener('mouseleave',()=>{mouse.x=-999;mouse.y=-999;});
+  window.addEventListener('resize',resize);
+  resize();loop();
+})();
+
+/* ═══════════════════════════════════════════
+   SHEEP CLICK
+═══════════════════════════════════════════ */
+document.getElementById('sheep-wrap').addEventListener('click',function(){
+  if(this.classList.contains('jumping'))return;
+  this.classList.add('jumping');
+  setTimeout(()=>this.classList.remove('jumping'),700);
+  spawnMini(this.getBoundingClientRect());
+});
+function spawnMini(rect){
+  const cx=rect.left+rect.width/2,cy=rect.top;
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div');
+    p.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;width:8px;height:8px;border-radius:50%;
+      background:${['#f5c842','#ffe066','#ff8800'][Math.floor(rand(0,3))]};
+      pointer-events:none;z-index:999;
+      animation:fwFly .7s ease-out forwards;
+      --tx:${rand(-60,60)}px;--ty:${rand(-80,-20)}px;--dur:.7s`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),800);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FIREWORKS
+═══════════════════════════════════════════ */
+const fwBtn=document.getElementById('fw-btn');
+let fwActive=false;
+fwBtn.addEventListener('click',function(){
+  if(fwActive)return;
+  fwActive=true;
+  const rect=this.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top;
+  launchBurst(cx,cy,40);
+  setTimeout(()=>launchBurst(rand(100,window.innerWidth-100),rand(80,300),60),600);
+  setTimeout(()=>launchBurst(rand(100,window.innerWidth-100),rand(80,300),60),1000);
+  setTimeout(()=>grandFinale(),1400);
+  setTimeout(()=>{fwActive=false;},4000);
+});
+
+function launchBurst(x,y,n){
+  for(let i=0;i<n;i++){
+    const p=document.createElement('div');
+    const angle=rand(0,360)*Math.PI/180;
+    const speed=rand(40,180);
+    const color=`hsl(${rand(0,360)},90%,${rand(55,75)}%)`;
+    const size=rand(3,8);
+    p.className='fw-particle';
+    p.style.cssText=`
+      left:${x}px;top:${y}px;
+      width:${size}px;height:${size}px;
+      background:${color};
+      --tx:${Math.cos(angle)*speed}px;
+      --ty:${Math.sin(angle)*speed+rand(20,60)}px;
+      --dur:${rand(.5,1.1)}s;
+      animation-delay:${rand(0,.15)}s;
+      box-shadow:0 0 ${size*2}px ${color};
+    `;
+    document.getElementById('fw-layer').appendChild(p);
+    setTimeout(()=>p.remove(),1300);
+  }
+}
+
+function grandFinale(){
+  const cols=6;
+  for(let i=0;i<cols;i++){
+    setTimeout(()=>{
+      launchBurst(rand(60,window.innerWidth-60),rand(60,250),50);
+      spawnConfetti(20);
+    },i*180);
+  }
+}
+
+function spawnConfetti(n){
+  const colors=['#f5c842','#1a8a7a','#c0392b','#4a1a8a','#ffe066','#ff8800'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    const w=rand(6,14),h=rand(4,8);
+    c.className='confetti';
+    c.style.cssText=`
+      left:${rand(0,100)}%;
+      width:${w}px;height:${h}px;
+      background:${colors[Math.floor(rand(0,colors.length))]};
+      border-radius:${rand(0,3)}px;
+      --dur:${rand(2,4.5)}s;
+      --rot:${rand(360,1080)}deg;
+      animation-delay:${rand(0,.5)}s;
+    `;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),5000);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   GIFT BOXES
+═══════════════════════════════════════════ */
+const GIFTS=[
+  {emoji:'🌟',label:'Noor',ar:'نور',blessing:'May Allah fill your home with light, love, and endless blessings this Eid.',arb:'نور الله بيتك وقلبك'},
+  {emoji:'🕌',label:'Imaan',ar:'إيمان',blessing:'May your faith grow stronger and your prayers be accepted.',arb:'تقبل الله أعمالك'},
+  {emoji:'🌙',label:'Rahma',ar:'رحمة',blessing:'May you be surrounded by mercy, peace, and divine grace.',arb:'رحمة الله عليكم'},
+  {emoji:'🐑',label:'Sacrifice',ar:'أضحى',blessing:'May your sacrifice be accepted and your heart be purified.',arb:'تقبل الله قربانكم'},
+  {emoji:'💎',label:'Baraka',ar:'بركة',blessing:'May your blessings multiply and your life overflow with joy.',arb:'بارك الله فيك'},
+  {emoji:'🕊️',label:'Salaam',ar:'سلام',blessing:'May peace, health, and happiness be your companions always.',arb:'السلام عليكم ورحمة الله'},
+];
+
+const grid=document.getElementById('gifts-grid');
+GIFTS.forEach((g,i)=>{
+  const wrap=document.createElement('div');
+  wrap.className='gift-wrap';
+  wrap.style.transitionDelay=`${i*.1}s`;
+  wrap.innerHTML=`
+    <div class="gift-inner" id="gi${i}">
+      <div class="gift-face">
+        <div class="gift-emoji">${g.emoji}</div>
+        <div class="gift-label">${g.label} · <span style="font-family:Lateef,serif">${g.ar}</span></div>
+      </div>
+      <div class="gift-back">
+        <div class="gift-blessing">${g.blessing}<br><span class="gift-ar">${g.arb}</span></div>
+      </div>
+    </div>`;
+  wrap.querySelector('.gift-inner').addEventListener('click',function(){
+    this.classList.toggle('flipped');
+    if(this.classList.contains('flipped'))spawnMini(this.getBoundingClientRect());
+  });
+  grid.appendChild(wrap);
+});
+
+/* ═══════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════ */
+function initScrollReveal(){
+  const items=document.querySelectorAll('.gift-wrap');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+  },{threshold:.15});
+  items.forEach(el=>obs.observe(el));
+}
+</script>
+</body>
+</html>
